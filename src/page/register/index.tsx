@@ -9,7 +9,7 @@ import { loadavg } from 'os';
 function RegistrationForm() {
 
   const [loading, setLoading] = useState(false);
-
+  const [username, setUsername] = useState('');
   const [form] = Form.useForm();
   const [verifiedForm] = Form.useForm();
 
@@ -45,8 +45,12 @@ function RegistrationForm() {
   }
 
 
+
+
   const onFinish = async (values: any) => {
     try {
+
+      setUsername(values.userName);
       setLoading(true);  // Set loading trạng thái khi bắt đầu hành động
       setTimeout(() => {
         // Sau khi tác vụ hoàn tất
@@ -61,7 +65,7 @@ function RegistrationForm() {
       setCheckForm(true);
       message.success('Register success');
       console.info("Register success", data);
-    
+
 
     }
     catch (error) {
@@ -69,6 +73,9 @@ function RegistrationForm() {
     }
 
   };
+
+
+
 
 
 
@@ -85,6 +92,7 @@ function RegistrationForm() {
           name="userName"
           label="Username"
           rules={[{ required: true, message: 'Please enter your username!' }]}
+
         >
           <Input placeholder="Enter your username" />
         </Form.Item>
@@ -130,17 +138,17 @@ function RegistrationForm() {
 
         <Form.Item
           name="role"
-          label="Role"   
-          rules={[{ required: true, message: 'Please select your role!' }]}         
+          label="Role"
+          rules={[{ required: true, message: 'Please select your role!' }]}
         >
-        {/* mặc định là 1 hàng có value user */}
-          <Select  placeholder="Enter your role" >
+          {/* mặc định là 1 hàng có value user */}
+          <Select placeholder="Enter your role" >
             <Select.Option value="user">User</Select.Option>
             <Select.Option disabled value="admin">Admin</Select.Option>
 
-         
+
           </Select>
-         
+
         </Form.Item>
 
         <Form.Item>
@@ -185,8 +193,9 @@ function RegistrationForm() {
             name="email"
             label="Email"
             rules={[{ required: true, message: 'Please enter your email!', type: 'email' }]}
+           
           >
-            <Input placeholder="Enter your email" />
+            <Input defaultValue={username} />
           </Form.Item>
 
           <Form.Item

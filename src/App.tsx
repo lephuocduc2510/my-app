@@ -2,18 +2,28 @@ import React from 'react'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import LoginForm from './components/login'
+
 import { Sign } from 'crypto'
-import RegistrationForm from './components/register'
+
 import EmailVerify from './components/emailVerification'
 import logo from '../src/image/logo.png'
 import { Footer, Header } from 'antd/es/layout/layout'
 import { Button, Col, Divider, Dropdown, Input, Menu, Row } from 'antd'
 import { DownOutlined, FacebookOutlined, InstagramOutlined, LinkOutlined, TwitchOutlined } from '@ant-design/icons';
 import Home from './page/home'
+import LoginForm from './page/login'
+import RegistrationForm from './page/register'
+import Login from './function/loginWithName'
+import AdminHome from './page/admin/home'
+import Users from './page/admin/user'
+// import 'antd/dist/antd.css';
 
 // import 'antd/dist/antd.css';
 
+const signOut = () => {
+  localStorage.removeItem('token');
+  window.location.href = '/login';
+}
 
 const menu = (
   <Menu>
@@ -69,24 +79,28 @@ function App() {
                   </Dropdown>
                 </Menu.Item>
                 <Menu.Item key="contact">
-                  <a href="index.html#contact">Contact</a>
+                  <a onClick={signOut} >Đăng xuất</a>
                 </Menu.Item>
               </Menu>
 
-              <Button type="primary" className="btn-getstarted" href="index.html#about">
-                Get Started
-              </Button>
+              <Login />
             </div>
           </Header>
 
           <div className="auth-inner">
             <Routes>
+              {/* Các route cơ bản */}
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/register" element={<RegistrationForm />} />
               <Route path="/auth/email-sent" element={<EmailVerify />} />
-              <Route path='/auth/verify-email/:userId/:unique_string' element={<EmailVerify />} />
+              <Route path="/auth/verify-email/:userId/:unique_string" element={<EmailVerify />} />
+              <Route path="/admin/user" element={<Users />} />
+              {/* Route cho trang Admin và các route con */}
+              <Route path="/admin" element={<AdminHome />}>
+                
+              </Route>
             </Routes>
           </div>
 

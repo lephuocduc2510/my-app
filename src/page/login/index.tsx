@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Checkbox, message, Modal } from 'antd';
 import { axiosClient } from '../../libraries/axiosClient';
 import { get } from 'http';
+const { jwtDecode } = require('jwt-decode');
+
+
+
+
 
 const LoginForm = () => {
   const [hide, setHide] = useState(false); // trạng thái điều khiển hiển thị modal
@@ -25,7 +30,7 @@ const LoginForm = () => {
       if (response.status === 200) {
         message.success('Email sent');
         console.log("Email sent", response.data.result);
-        setCurrentPage(currentPage+1) // Chuyển sang trang 2 khi email được gửi thành công
+        setCurrentPage(currentPage + 1) // Chuyển sang trang 2 khi email được gửi thành công
         console.log("Email sent", currentPage);
       } else {
         message.error('Email failed');
@@ -35,11 +40,11 @@ const LoginForm = () => {
       console.error("Email submission failed:", error);
     }
 
-   
+
 
   }
 
- 
+
   const changePassword = async (values: any) => {
     try {
       console.log("Change password values", values);
@@ -58,6 +63,51 @@ const LoginForm = () => {
     }
   };
 
+
+  const checkLogin = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('No token found, please login again.');
+      window.location.href = '/login';    // Redirect to login page if no token found
+      return;
+    }
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded) {
+        console.log("paylaod", decoded);
+        if (decoded.role === "user") {
+          message.success('Login success');
+          window.location.href = '/home';  
+          // window.location.href = '/management/users';  // Redirect to users management page
+        }
+        else if (decoded.role === "mod") {
+          message.success('Login success');
+          window.location.href = '/home';  
+        }
+        else
+        {
+          message.success('Login success');
+          window.location.href = '/admin/user';  
+        }
+         
+      }
+
+      else {
+        message.error('Error');
+        console.log("Login failed no payload");
+
+      }
+    } catch (error) {
+      console.error("Login failed", error);
+      message.error('An error occurred while checking login status');
+      window.location.href = '/404-page'; // Redirect to 404 page in case of error
+    }
+  };
+
+
+  
+
+
   const onFinish = async (values: any) => {
     try {
       const response = await axiosClient.post('/api/auth/login', values);
@@ -65,12 +115,14 @@ const LoginForm = () => {
         localStorage.setItem('token', response.data.result.accessToken);
         message.success('Login success');
         console.log("Login success", response.data.result.accessToken);
-        window.location.href = '/home';
+        checkLogin();
+
       } else {
         message.error('Login failed');
         console.log("Login failed", response.data.errors);
       }
     } catch (error) {
+      message.error('Login failed');
       console.error("Login failed", error);
     }
   };
@@ -126,17 +178,17 @@ const LoginForm = () => {
         okText={currentPage === 1 ? 'Next' : 'Complete'}
         onOk={() => {
           form
-          .validateFields()
-          .then(() => {
-            if (currentPage === 1) {
-              form.submit(); // Submit cho form gửi email
-            } else {
-              changePassword(form.getFieldsValue()); // Gửi yêu cầu đổi mật khẩu
-            }
-          })
-          .catch((info) => {
-            console.log('Validation Failed:', info);
-          });
+            .validateFields()
+            .then(() => {
+              if (currentPage === 1) {
+                form.submit(); // Submit cho form gửi email
+              } else {
+                changePassword(form.getFieldsValue()); // Gửi yêu cầu đổi mật khẩu
+              }
+            })
+            .catch((info) => {
+              console.log('Validation Failed:', info);
+            });
         }}
         cancelText={currentPage === 1 ? 'Cancel' : 'Back'}
         onCancel={() => {
