@@ -51,11 +51,21 @@
     border-radius: 8px;
   }
   
-  footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    margin-top: 20px;
+  
+
+
+
+  .footer {
+  
+    font-size: 14px;
+    /* padding-bottom: 50px; */
+    position: relative;
+    background-color: #567086;
+    color: var(--nav-mobile-background-color);
+    padding-bottom: 30px;
+    -webkit-box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
+    -moz-box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
+    box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
   }
+  
   

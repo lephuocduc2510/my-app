@@ -3,32 +3,34 @@ import React from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import Password from 'antd/es/input/Password';
 import { axiosClient } from '../../../libraries/axiosClient';
+import TextArea from 'antd/es/input/TextArea';
 
 
 type Props = {};
 
 type FieldType = {
-    id: string;
-    userName: string;
-    name: string;
-    role: string;
-    emailConfirmed: boolean;
-    created_at: string;
-    updated_at: string;
+    idRooms: string;
+    roomName: string;
+    createdDate: Date;
+    createdBy: string;
+    isActive: Boolean;
+    description: string;
+    user: string;
+    
 };
 
 
 const token = localStorage.getItem('token')
 
-export default function Users({ }: Props) {
+export default function Rooms({ }: Props) {
 
 
-    const [users, setUsers] = React.useState([]);
-    const [selectedUser, setSelectedUser] = React.useState<any>(null);
+    const [rooms, setRooms] = React.useState([]);
+    const [selectedRoom, setSelectedRoom] = React.useState<any>(null);
     const [createForm] = Form.useForm<FieldType>();
     const [updateForm] = Form.useForm<FieldType>();
 
-    const getUsers = async () => {
+    const getRooms = async () => {
 
         const config = {
             headers: {
@@ -38,15 +40,15 @@ export default function Users({ }: Props) {
 
         try {
 
-            const response = await axiosClient.get('/api/user', config);
-            setUsers(response.data.result);
+            const response = await axiosClient.get('/api/rooms', config);
+            setRooms(response.data.result);
         } catch (error) {
             console.log('Error:', error);
         }
     };
 
     React.useEffect(() => {
-        getUsers();
+        getRooms();
     }, []);
 
     const onFinish = async (values: any) => {
@@ -57,8 +59,8 @@ export default function Users({ }: Props) {
         };
         try {
             console.log('Success:', values);
-            await axiosClient.post('/api/user', values, config);
-            getUsers();
+            await axiosClient.post('/api/rooms', values, config);
+            getRooms();
             createForm.resetFields();
         } catch (error) {
             console.log('Error:', error);
@@ -73,8 +75,8 @@ export default function Users({ }: Props) {
             },
         };
         try {
-            await axiosClient.delete(`/api/user/${id}`, config);
-            getUsers();
+            await axiosClient.delete(`/api/rooms/${id}`, config);
+            getRooms();
             message.success('user deleted successfully!');
         } catch (error) {
             console.log('Error:', error);
@@ -89,9 +91,9 @@ export default function Users({ }: Props) {
         };
         try {
             console.log('Success:', values);
-            await axiosClient.put(`/api/user/${selectedUser.id}`, values, config);
-            getUsers();
-            setSelectedUser(null);
+            await axiosClient.put(`/api/user/${selectedRoom.id}`, values, config);
+            getRooms();
+            setSelectedRoom(null);
             message.success('user updated successfully!');
         } catch (error) {
             console.log('Error:', error);
@@ -101,44 +103,45 @@ export default function Users({ }: Props) {
     const columns = [
         {
             title: 'STT',
-            dataIndex: 'id', // Không bắt buộc nếu chỉ hiển thị số thứ tự
-            key: 'id',
-            width: '20%',
-            render: (_: any, __: any, index: number) => index + 1, // index là chỉ số của hàng (bắt đầu từ 0)
+            dataIndex: 'idRooms', // Không bắt buộc nếu chỉ hiển thị số thứ tự
+            key: 'idRooms',
+            width: '1%',
+             
           },
         {
-            title: 'Username',
-            dataIndex: 'userName',
-            key: 'userName',
+            title: 'Room Name',
+            dataIndex: 'roomName',
+            key: 'roomName',
+            width: '1%',
         },
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
+     
 
 
         {
-            title: 'Role',
-            dataIndex: 'role',
-            key: 'role',
+            title: 'Status',
+            dataIndex: 'isActive',
+            key: 'isActive',
+            width: '1%',
         },
 
         {
-            title: 'Verified',
-            dataIndex: 'emailConfirmed',
-            key: 'emailConfirmed',
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
+            width: '1%',
         },
-        // {
-        //     title: 'Created at',
-        //     dataIndex: 'created_at',
-        //     key: 'created_at',
-        // },
-        // {
-        //     title: 'Updated at',
-        //     dataIndex: 'updated_at',
-        //     key: 'updated_at',
-        // },
+        {
+            title: 'Created Date',
+            dataIndex: 'createdDate',
+            key: 'createdDate',
+            width: '1%',
+        },
+        {
+            title: 'Created By',
+            dataIndex: 'createdBy',
+            key: 'createdBy',
+            width: '1%',
+        },
 
         {
             title: 'Actions',
@@ -152,7 +155,7 @@ export default function Users({ }: Props) {
                             type='primary'
                             icon={<EditOutlined />}
                             onClick={() => {
-                                setSelectedUser(record);
+                                setSelectedRoom(record);
                                 updateForm.setFieldsValue(record);
                             }}
                         />
@@ -177,22 +180,24 @@ export default function Users({ }: Props) {
             <Card title='Create new user' style={{ width: '100%' }}>
                 <Form form={createForm} name='create-user' labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} initialValues={{ name: '', description: '' }} onFinish={onFinish}>
                     <Form.Item<FieldType>
-                        label='Username'
-                        name='userName'
-                        rules={[{ required: true, message: 'Please input username!', type: 'email' }]}
+                        label='Room Name'
+                        name='roomName'
+                        rules={[{ required: true, message: 'Please input room name!' }]}
                         hasFeedback
 
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item<FieldType>
-                        label='Name'
-                        name='name'
-                        rules={[{ required: true, message: 'Please input email!' }]}
+                        label='Description'
+                        name='description'
+                        // rules={[{ required: true, message: 'Please input email!' }]}
                         hasFeedback
                     >
-                        <Input />
+                        <TextArea rows={3} />
                     </Form.Item>
+
+                    
 
                 
 
@@ -209,7 +214,7 @@ export default function Users({ }: Props) {
 
 
             <Card title='List of users' style={{ width: '100%', marginTop: 36 }}>
-                <Table dataSource={users} columns={columns} />
+                <Table dataSource={rooms} columns={columns} />
             </Card>
 
 
@@ -220,82 +225,35 @@ export default function Users({ }: Props) {
             <Modal
                 centered
                 title='Edit user'
-                open={selectedUser}
+                open={selectedRoom}
                 okText='Save changes'
                 onOk={() => {
                     updateForm.submit();
                 }}
                 onCancel={() => {
-                    setSelectedUser(null);
+                    selectedRoom(null);
                 }}
             >
                 <Form form={updateForm} name='update-user' labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} initialValues={{ name: '', description: '' }} onFinish={onUpdate}>
-                    <Form.Item<FieldType>
-                        label='name'
-                        name='name'
-                        rules={[{ required: true, message: 'Please input username!' }]}
-                        
+                <Form.Item<FieldType>
+                        label='Room Name'
+                        name='roomName'
+                        rules={[{ required: true, message: 'Please input room name!' }]}
                         hasFeedback
 
-                    >
-                        <Input disabled />
-                    </Form.Item>
-                    <Form.Item<FieldType>
-                        label='Username'
-                        name='userName'
-                        rules={[{ required: true, type: 'email', message: 'Please input email!' }]}
-                        hasFeedback
-                    >
-                        <Input  disabled/>
-                    </Form.Item>
-
-                
-
-                    <Form.Item<FieldType>
-                        label="Role"
-                        name="role"
-                        rules={[{ required: true, message: 'Please select a role!' }]}
-                        hasFeedback
-                    >
-                        <Select>
-                            <Select.Option value="admin">Admin</Select.Option>
-                            <Select.Option value="mod">Mod</Select.Option>
-                            <Select.Option value="user">User</Select.Option>
-                        </Select>
-                    </Form.Item>
-
-
-                    {/* <Form.Item<FieldType>
-                        label='Verified'
-                        name='emailConfirmed'
-                        rules={[{  message: 'Please input verified!', type: 'boolean' }]}
-                        hasFeedback
-                    >
-                        <Select>
-                            <Select.Option value="1">True</Select.Option>
-                            <Select.Option value="2">False</Select.Option>
-                            
-                        </Select>
-                    </Form.Item> */}
-
-
-                    {/* <Form.Item<FieldType>
-                        label='Created_at'
-                        name='created_at'
-                        rules={[{  message: 'Please input created_at!', type: 'date' }]}
-                        hasFeedback
                     >
                         <Input />
                     </Form.Item>
-
                     <Form.Item<FieldType>
-                        label='Updated_at'
-                        name='updated_at'
-                        rules={[{  message: 'Please input update date!', type: 'date' }]}
+                        label='Description'
+                        name='description'
+                        // rules={[{ required: true, message: 'Please input email!' }]}
                         hasFeedback
                     >
-                        <Input />
-                    </Form.Item> */}
+                        <TextArea rows={3} />
+                    </Form.Item>
+
+             
                 </Form>
             </Modal>
         </div>

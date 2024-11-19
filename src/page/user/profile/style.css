@@ -1,0 +1,34 @@
+
+
+  /* Tạo hiệu ứng border khi trường nhập liệu đang được chọn */
+.form-control-edit {
+  border: 2px solid #4CAF50; /* Màu sắc viền khi đang chỉnh sửa */
+  border-radius: 5px;
+  padding: 10px;
+  transition: all 0.3s ease;
+  background-color: aquamarine;
+  color: burlywood;
+}
+
+.form-control-edit:focus {
+  outline: none;
+  border-color: #45a049; /* Màu sắc viền khi trường nhập liệu được focus */
+  box-shadow: 0 0 8px rgba(72, 183, 72, 0.5); /* Hiệu ứng bóng khi trường nhập liệu được focus */
+}
+
+/* Tạo kiểu cho nút lưu thay đổi và nút quay lại */
+.btn-edit {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.btn-edit:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+
+  
+}
+
+

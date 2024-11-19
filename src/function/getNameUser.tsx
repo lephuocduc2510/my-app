@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom';
         const data = JSON.parse(atob(base64 + padding));
         
         const username = data.unique_name;
+        localStorage.setItem('username', username);
     
         // gọi api lấy thông tin user
         if (!username) {

@@ -51,11 +51,10 @@ function RegistrationForm() {
     try {
 
       setUsername(values.userName);
-      setLoading(true);  // Set loading trạng thái khi bắt đầu hành động
-      setTimeout(() => {
-        // Sau khi tác vụ hoàn tất
-        setLoading(false);  // Tắt trạng thái loading
-        message.success('Registration Successful');  // Hiển thị thông báo thành công
+      setLoading(true);  
+      setTimeout(() => {      
+        setLoading(false);  
+        message.success('Registration Successful');  
 
       }
         , 5000);
@@ -91,7 +90,7 @@ function RegistrationForm() {
         <Form.Item
           name="userName"
           label="Username"
-          rules={[{ required: true, message: 'Please enter your username!' }]}
+          rules={[{ required: true, message: 'Please enter your email!', type: 'email' }]}
 
         >
           <Input placeholder="Enter your username" />
@@ -111,7 +110,26 @@ function RegistrationForm() {
         <Form.Item
           name="password"
           label="Password"
-          rules={[{ required: true, message: 'Please enter your password!' }]}
+          rules={[
+            { required: true, message: 'Please enter your password!' },
+            {
+              validator: (_, value) => {
+                if (!value) {
+                  return Promise.reject(new Error());
+                }
+                // Điều kiện mật khẩu: ít nhất 1 chữ cái in hoa, 1 số, 1 ký tự đặc biệt
+                const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+                if (!passwordRegex.test(value)) {
+                  return Promise.reject(
+                    new Error(
+                      'Password must be at least 8 characters and include an uppercase letter, a number, and a special character.'
+                    )
+                  );
+                }
+                return Promise.resolve();
+              },
+            },
+          ]}
         >
           <Input.Password placeholder="Enter your password" />
         </Form.Item>
@@ -136,20 +154,7 @@ function RegistrationForm() {
           <Input.Password placeholder="Confirm your password" />
         </Form.Item>
 
-        <Form.Item
-          name="role"
-          label="Role"
-          rules={[{ required: true, message: 'Please select your role!' }]}
-        >
-          {/* mặc định là 1 hàng có value user */}
-          <Select placeholder="Enter your role" >
-            <Select.Option value="user">User</Select.Option>
-            <Select.Option disabled value="admin">Admin</Select.Option>
-
-
-          </Select>
-
-        </Form.Item>
+       
 
         <Form.Item>
           <Button loading={loading} type="primary" htmlType="submit" block>
@@ -193,9 +198,9 @@ function RegistrationForm() {
             name="email"
             label="Email"
             rules={[{ required: true, message: 'Please enter your email!', type: 'email' }]}
-           
+            initialValue={username}  // Giả sử bạn muốn sử dụng username làm giá trị mặc định
           >
-            <Input defaultValue={username} />
+            <Input  disabled/>
           </Form.Item>
 
           <Form.Item

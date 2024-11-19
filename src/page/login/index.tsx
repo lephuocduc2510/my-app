@@ -9,10 +9,11 @@ const { jwtDecode } = require('jwt-decode');
 
 
 const LoginForm = () => {
-  const [hide, setHide] = useState(false); // trạng thái điều khiển hiển thị modal
-  const [currentPage, setCurrentPage] = useState(1); // trạng thái trang hiện tại của modal
-
+  const [hide, setHide] = useState(false); 
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [username, setUsername] = useState(''); 
   const [form] = Form.useForm();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const setHideModal = () => {
     setHide(true);
@@ -26,6 +27,7 @@ const LoginForm = () => {
 
   const getEmail = async (values: any) => {
     try {
+      setUsername(values.email); 
       const response = await axiosClient.post('/api/auth/forgot-password', values);
       if (response.status === 200) {
         message.success('Email sent');
@@ -55,7 +57,8 @@ const LoginForm = () => {
         setHide(false); // Đóng modal sau khi đổi mật khẩu thành công
         setCurrentPage(1); // Đặt lại trang về ban đầu
       } else {
-        message.error('Change password failed');
+
+        message.error("Change password failed");
         console.log("Change password failed", response.data.errors);
       }
     } catch (error) {
@@ -87,7 +90,7 @@ const LoginForm = () => {
         else
         {
           message.success('Login success');
-          window.location.href = '/admin/user';  
+          window.location.href = '/users';  
         }
          
       }
@@ -117,13 +120,21 @@ const LoginForm = () => {
         console.log("Login success", response.data.result.accessToken);
         checkLogin();
 
-      } else {
-        message.error('Login failed');
-        console.log("Login failed", response.data.errors);
+      } else {  
+    
+        
+        const error = response.data.errors?.message || 'Login failed'; 
+        setErrorMessage(error); 
+        message.error(error);
+        console.log("Login failed", response.data.errors[0]); 
       }
-    } catch (error) {
-      message.error('Login failed');
-      console.error("Login failed", error);
+    } catch (error: any) {
+      if (error.response && error.response.data && Array.isArray(error.response.data.errors)) {
+        const errors = error.response.data.errors;
+        setErrorMessage(errors[0]); 
+      } else {
+        setErrorMessage('An unexpected error occurred');
+      }
     }
   };
 
@@ -153,6 +164,8 @@ const LoginForm = () => {
           label="Password"
           name="password"
           rules={[{ required: true, message: 'Please input your password!' }]}
+          validateStatus={errorMessage ? 'error' : ''}
+           help={errorMessage}
         >
           <Input.Password placeholder="Enter your password" />
         </Form.Item>
@@ -227,17 +240,21 @@ const LoginForm = () => {
             </Form.Item>
 
             <Form.Item
-              name="email"
-              label="Email"
-              rules={[{ required: true, message: 'Please enter your email!', type: 'email' }]}
-            >
-              <Input placeholder="Enter your email" />
-            </Form.Item>
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: 'Please enter your email!', type: 'email' }]}
+            initialValue={username} 
+            style={{display: 'none'}}
+          >
+            <Input  disabled/>
+          </Form.Item>
+
 
             <Form.Item
               name="password"
               label="Password"
               rules={[{ required: true, message: 'Please enter your password!' }]}
+           
             >
               <Input.Password placeholder="Enter your password" />
             </Form.Item>
