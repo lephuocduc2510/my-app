@@ -1,9 +1,10 @@
 import { Button, Card, Form, Input, Space, Table, Popconfirm, message, Modal, Select } from 'antd';
 import React from 'react';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import Password from 'antd/es/input/Password';
 import { axiosClient } from '../../../libraries/axiosClient';
 import TextArea from 'antd/es/input/TextArea';
+import { useNavigate } from 'react-router-dom';
 
 
 type Props = {};
@@ -29,6 +30,7 @@ export default function Rooms({ }: Props) {
     const [selectedRoom, setSelectedRoom] = React.useState<any>(null);
     const [createForm] = Form.useForm<FieldType>();
     const [updateForm] = Form.useForm<FieldType>();
+    const navigate = useNavigate(); 
 
     const getRooms = async () => {
 
@@ -150,26 +152,38 @@ export default function Rooms({ }: Props) {
             width: '1%',
             render: (text: any, record: any) => {
                 return (
-                    <Space size='small'>
-                        <Button
-                            type='primary'
-                            icon={<EditOutlined />}
-                            onClick={() => {
-                                setSelectedRoom(record);
-                                updateForm.setFieldsValue(record);
-                            }}
-                        />
-
-                        <Popconfirm
-                            title='Delete the user'
-                            description='Are you sure to delete this user?'
-                            onConfirm={() => {
-                                onDelete(record.id);
-                            }}
-                        >
-                            <Button type='primary' danger icon={<DeleteOutlined />} />
-                        </Popconfirm>
-                    </Space>
+                    <Space size="small">
+                    {/* Nút sửa */}
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                            setSelectedRoom(record);
+                            updateForm.setFieldsValue(record);
+                        }}
+                    />
+                
+                    {/* Nút xóa */}
+                    <Popconfirm
+                        title="Delete the user"
+                        description="Are you sure to delete this user?"
+                        onConfirm={() => {
+                            onDelete(record.id);
+                        }}
+                    >
+                        <Button type="primary" danger icon={<DeleteOutlined />} />
+                    </Popconfirm>
+                
+                    {/* Nút xem chi tiết */}
+                    <Button
+                        type="default"
+                        icon={<EyeOutlined />} // Icon "xem chi tiết"
+                        onClick={() => {
+                            navigate(`/rooms/${record.idRooms}`);
+                        }}
+                    />
+                </Space>
+                
                 );
             },
         },
@@ -196,12 +210,6 @@ export default function Rooms({ }: Props) {
                     >
                         <TextArea rows={3} />
                     </Form.Item>
-
-                    
-
-                
-
-
 
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

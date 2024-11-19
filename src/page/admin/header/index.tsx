@@ -170,8 +170,12 @@ const HeaderAdmin = () => {
         <FontAwesomeIcon icon={faTable} className="me-3" /> Managers
       </MDBDropdownToggle>
       <MDBDropdownMenu className="dropdown-menu-end" style={{left: '-100px', inset: '-73px 0px auto ', transform: 'translate3d(200px, 64px, 0px)' }}>
-        <MDBDropdownItem link>Users</MDBDropdownItem>
-        <MDBDropdownItem link>Rooms</MDBDropdownItem>
+        <MDBDropdownItem link onClick={ ()=> {
+          window.location.href = '/users';
+        }}>Users</MDBDropdownItem>
+        <MDBDropdownItem link onClick={ ()=> {
+          window.location.href = '/rooms';
+        }}>Rooms</MDBDropdownItem>
         <MDBDropdownItem link>Roles</MDBDropdownItem>
       </MDBDropdownMenu>
     </MDBDropdown>

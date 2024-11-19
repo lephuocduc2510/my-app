@@ -16,7 +16,7 @@ import { MDBContainer ,  MDBRow,
 
 export default function Chat() {
   return (
-    <MDBContainer fluid className="py-5 gradient-custom mt-5" style={{marginTop: 50}}>
+    <MDBContainer fluid className="py-5 gradient-custom mt-5 container" style={{marginTop: 50}}>
       <MDBRow>
         <MDBCol md="6" lg="5" xl="4" className="mb-4 mb-md-0">
           <h5 className="font-weight-bold mb-3 text-center text-white">

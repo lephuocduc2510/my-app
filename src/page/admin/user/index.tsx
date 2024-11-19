@@ -194,6 +194,20 @@ export default function Users({ }: Props) {
                         <Input />
                     </Form.Item>
 
+                    <Form.Item<FieldType>
+                        label="Role"
+                        name="role"
+                        rules={[{ required: true, message: 'Please select a role!' }]}
+                        hasFeedback
+                    >
+                        <Select>
+                            <Select.Option value="admin">Admin</Select.Option>
+                            <Select.Option value="mod">Mod</Select.Option>
+                            <Select.Option value="user">User</Select.Option>
+                        </Select>
+                    </Form.Item>
+
+
                 
 
 

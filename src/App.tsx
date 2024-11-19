@@ -23,6 +23,7 @@ import UserProfile from './page/user/profile'
 import ProfilePage from './page/user/profile'
 import Admin2 from './page/admin/admin2'
 import Rooms from './page/admin/room'
+import RoomsUser from './page/admin/roomUser'
 
 
 
@@ -54,6 +55,7 @@ function App() {
       <Route path="/profile" element={<LayoutAdmin><AccountSettings /></LayoutAdmin>} />
       <Route path="/users" element={<LayoutAdmin><Users /></LayoutAdmin>} />
       <Route path="/rooms" element={<LayoutAdmin><Rooms /></LayoutAdmin>} />
+      <Route path="/rooms/:id" element={<LayoutAdmin><RoomsUser /></LayoutAdmin>} />
      
     </Routes>
   </Router>
