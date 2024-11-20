@@ -10,14 +10,14 @@ import { useNavigate } from 'react-router-dom';
 type Props = {};
 
 type FieldType = {
-    idRooms: string;
+    id: Int32Array;
     roomName: string;
     createdDate: Date;
     createdBy: string;
     isActive: Boolean;
     description: string;
     user: string;
-    
+
 };
 
 
@@ -30,7 +30,7 @@ export default function Rooms({ }: Props) {
     const [selectedRoom, setSelectedRoom] = React.useState<any>(null);
     const [createForm] = Form.useForm<FieldType>();
     const [updateForm] = Form.useForm<FieldType>();
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const getRooms = async () => {
 
@@ -77,6 +77,7 @@ export default function Rooms({ }: Props) {
             },
         };
         try {
+            console.log('Success:', id);
             await axiosClient.delete(`/api/rooms/${id}`, config);
             getRooms();
             message.success('user deleted successfully!');
@@ -86,6 +87,13 @@ export default function Rooms({ }: Props) {
     };
 
     const onUpdate = async (values: any) => {
+         
+         const data = {
+            idRooms: selectedRoom.idRooms,
+            roomName: values.roomName,
+            description: values.description,
+            isActive: selectedRoom.isActive
+        };
         const config = {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -93,7 +101,7 @@ export default function Rooms({ }: Props) {
         };
         try {
             console.log('Success:', values);
-            await axiosClient.put(`/api/user/${selectedRoom.id}`, values, config);
+            await axiosClient.put(`/api/rooms/${selectedRoom.idRooms}`, data, config);
             getRooms();
             setSelectedRoom(null);
             message.success('user updated successfully!');
@@ -105,18 +113,18 @@ export default function Rooms({ }: Props) {
     const columns = [
         {
             title: 'STT',
-            dataIndex: 'idRooms', // Không bắt buộc nếu chỉ hiển thị số thứ tự
-            key: 'idRooms',
+            dataIndex: 'id', // Không bắt buộc nếu chỉ hiển thị số thứ tự
+            key: 'id',
             width: '1%',
-             
-          },
+
+        },
         {
             title: 'Room Name',
             dataIndex: 'roomName',
             key: 'roomName',
             width: '1%',
         },
-     
+
 
 
         {
@@ -153,45 +161,46 @@ export default function Rooms({ }: Props) {
             render: (text: any, record: any) => {
                 return (
                     <Space size="small">
-                    {/* Nút sửa */}
-                    <Button
-                        type="primary"
-                        icon={<EditOutlined />}
-                        onClick={() => {
-                            setSelectedRoom(record);
-                            updateForm.setFieldsValue(record);
-                        }}
-                    />
-                
-                    {/* Nút xóa */}
-                    <Popconfirm
-                        title="Delete the user"
-                        description="Are you sure to delete this user?"
-                        onConfirm={() => {
-                            onDelete(record.id);
-                        }}
-                    >
-                        <Button type="primary" danger icon={<DeleteOutlined />} />
-                    </Popconfirm>
-                
-                    {/* Nút xem chi tiết */}
-                    <Button
-                        type="default"
-                        icon={<EyeOutlined />} // Icon "xem chi tiết"
-                        onClick={() => {
-                            navigate(`/rooms/${record.idRooms}`);
-                        }}
-                    />
-                </Space>
-                
+                        {/* Nút sửa */}
+                        <Button
+                            type="primary"
+                            icon={<EditOutlined />}
+                            onClick={() => {
+                                console.log("Selected Room:", record);
+                                setSelectedRoom(record);
+                                updateForm.setFieldsValue(record);
+                            }}
+                        />
+
+                        {/* Nút xóa */}
+                        <Popconfirm
+                            title="Delete the user"
+                            description="Are you sure to delete this user?"
+                            onConfirm={() => {
+                                onDelete(record.idRooms);
+                            }}
+                        >
+                            <Button type="primary" danger icon={<DeleteOutlined />} />
+                        </Popconfirm>
+
+                        {/* Nút xem chi tiết */}
+                        <Button
+                            type="default"
+                            icon={<EyeOutlined />} // Icon "xem chi tiết"
+                            onClick={() => {
+                                navigate(`/rooms/${record.idRooms}`);
+                            }}
+                        />
+                    </Space>
+
                 );
             },
         },
     ];
 
     return (
-        <div style={{ padding: 36 , marginTop: 50}}>
-            <Card title='Create new user' style={{ width: '100%' }}>
+        <div style={{ padding: 36, marginTop: 50 }}>
+            <Card title='Create new room' style={{ width: '100%' }}>
                 <Form form={createForm} name='create-user' labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} initialValues={{ name: '', description: '' }} onFinish={onFinish}>
                     <Form.Item<FieldType>
                         label='Room Name'
@@ -211,6 +220,18 @@ export default function Rooms({ }: Props) {
                         <TextArea rows={3} />
                     </Form.Item>
 
+                    <Form.Item<FieldType >
+                        label='createdBy'
+                        name='createdBy'
+                        // rules={[{ required: true, message: 'Please input email!' }]}
+                        hasFeedback
+                        style={{ display: 'none' }}
+                        initialValue={""}
+
+                    >
+                        <Input />
+                    </Form.Item>
+
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                         <Button type='primary' htmlType='submit'>
@@ -228,7 +249,7 @@ export default function Rooms({ }: Props) {
 
 
 
-             {/* Sửa user */}
+            {/* Sửa user */}
 
             <Modal
                 centered
@@ -239,11 +260,11 @@ export default function Rooms({ }: Props) {
                     updateForm.submit();
                 }}
                 onCancel={() => {
-                    selectedRoom(null);
+                    setSelectedRoom(null);
                 }}
             >
-                <Form form={updateForm} name='update-user' labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} initialValues={{ name: '', description: '' }} onFinish={onUpdate}>
-                <Form.Item<FieldType>
+                <Form form={updateForm} name='update-room' labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} initialValues={{ name: '', description: '' }} onFinish={onUpdate}>
+                    <Form.Item<FieldType>
                         label='Room Name'
                         name='roomName'
                         rules={[{ required: true, message: 'Please input room name!' }]}
@@ -261,7 +282,7 @@ export default function Rooms({ }: Props) {
                         <TextArea rows={3} />
                     </Form.Item>
 
-             
+
                 </Form>
             </Modal>
         </div>

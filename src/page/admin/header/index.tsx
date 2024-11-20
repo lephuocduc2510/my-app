@@ -12,17 +12,21 @@ import { MDBDropdown, MDBDropdownItem, MDBDropdownMenu, MDBDropdownToggle, MDBLi
 
 
 
-
+const signOut = () => {
+  localStorage.removeItem('token');
+  window.location.href = '/login';
+}
 
 const HeaderAdmin = () => {
   const [checkLogin, setCheckLogin] = useState(false);
   const token = localStorage.getItem('token');
+  const image = localStorage.getItem('image');
   const checkAuthentication = () => {
     //lấy role từ token
     if (token) {
       const role = JSON.parse(atob(token.split('.')[1])).role;
       if (role === 'admin') {
-        message.success('Welcome Admin');
+  
       }
       else {
         window.location.href = '/404-page';
@@ -54,7 +58,7 @@ const HeaderAdmin = () => {
           </button>
 
           {/* Links */}
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <div className="collapse navbar-collapse" id="navbarSupportedContent" style={{marginLeft: 254}}>
             {/* Left */}
             <ul className="navbar-nav me-auto mb-2 mb-lg-0 ">
               <li className="nav-item active">
@@ -121,7 +125,7 @@ const HeaderAdmin = () => {
                     <MDBDropdown>
                       <MDBDropdownToggle tag="a" className="hidden-arrow nav-link d-flex align-items-center">
                         <img
-                          src="https://mdbootstrap.com/img/new/avatars/2.jpg"
+                          src={image? image: "https://mdbootstrap.com/img/new/avatars/2.jpg"}
                           className="rounded-circle"
                           height="22"
                           alt="Avatar"
@@ -131,7 +135,7 @@ const HeaderAdmin = () => {
                       <MDBDropdownMenu>
                         <MDBDropdownItem link>My profile</MDBDropdownItem>
                         <MDBDropdownItem link>Settings</MDBDropdownItem>
-                        <MDBDropdownItem link>Log out</MDBDropdownItem>
+                        <MDBDropdownItem link onClick={signOut}>Log out</MDBDropdownItem>
                       </MDBDropdownMenu>
                     </MDBDropdown>
                   </MDBNavbarItem>

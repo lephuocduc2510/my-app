@@ -18,8 +18,7 @@ import {
   MDBListGroupItem
 } from 'mdb-react-ui-kit';
 import { axiosClient } from '../../../libraries/axiosClient';
-import userEvent from '@testing-library/user-event';
-import { config } from 'process';
+
 
 interface User {
   id: string;
@@ -42,9 +41,18 @@ export default function ProfilePage() {
   const token = localStorage.getItem('token') || null;
   const [name, setName] = React.useState('');
   const [editing, setEditing] = React.useState(false);
-  const [address, setAddress] = React.useState('');
   const [phoneNumber, setPhoneNumber] = React.useState('');
-  const [ImageUrl, setImageUrl] = React.useState('');
+  const [selectedImage, setSelectedImage] = React.useState<File | null>(null);
+  const [checkChange, setCheckChange] = React.useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+      console.log(e.target.files[0]);
+     
+    }
+  };
+
 
 
   const getUsers = async () => {
@@ -59,62 +67,54 @@ export default function ProfilePage() {
       }
       const response = await axiosClient.get(`api/user/${username}`, config);
       setUser(response.data.result);
-      console.log(response.data.result);
-      console.log(user);
-      console.log(username);
     } catch (error) {
       console.log('Error:', error);
     }
   }
-  
 
-  // const handleFileChange = async (e: any) => {
-  //   const file = e.target.files[0];
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-  //   try {
-  //     const config = {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     };
-  //     await axiosClient.put(`api/user/change-profile`, , config);
-      
-  //     console.log();
-  //   } catch (error) {
-  //     console.log('Error uploading file:', error);
-  //   }
-  // };
+
+
 
   const handleSaveChanges = async () => {
-    const updatedUser = {
-      name,
-      phoneNumber,
-      ImageUrl
-      
-    };
+    const formData = new FormData();
+
+    if (name) formData.append("Name", name);
+    if (phoneNumber) formData.append("PhoneNumber", phoneNumber);
+    if (selectedImage) formData.append("Image", selectedImage);
+
     try {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       };
-      await axiosClient.put(`api/user/change-profile`, updatedUser, config);
-      setEditing(false); // Turn off editing mode
-      getUsers(); // Refresh user data
-      console.log(updatedUser);
+      await axiosClient.put(`api/user/change-profile`, formData, config);
+      setEditing(false); // Tắt chế độ chỉnh sửa
+      getUsers(); // Cập nhật dữ liệu người dùng
     } catch (error) {
-      console.log('Error updating user:', error);
+      console.log("Error updating user:", error);
     }
   };
 
+
   React.useEffect(() => {
-    getUsers()
+    const timer = setTimeout(() => {
+      handleSaveChanges();  // Gọi hàm sau khi delay
+    }, 2000);  // Thời gian delay là 2000ms (2 giây)
+  
+    // Cleanup function để hủy setTimeout khi component unmount hoặc khi selectedImage thay đổi
+    return () => clearTimeout(timer);
+  }, [selectedImage]);  
+  React.useEffect(() => {
+    getUsers();
   }, [username]);
+
+
 
   return (
 
-    <section style={{ backgroundColor: '#eee' }}>
+    <section style={{ backgroundColor: '#eee', height: 750 }}>
       <MDBContainer className="py-5" >
         <MDBRow>
           <MDBCol>
@@ -133,20 +133,30 @@ export default function ProfilePage() {
             <MDBCard className="mb-4">
               <MDBCardBody className="text-center">
                 <MDBCardImage
-                  src={user?.imageUrl || "https://static.vecteezy.com/system/resources/previews/019/879/186/original/user-icon-on-transparent-background-free-png.png"}
+                  src={
+                    user?.imageUrl ||
+                    "https://static.vecteezy.com/system/resources/previews/019/879/186/original/user-icon-on-transparent-background-free-png.png"
+                  }
                   alt="avatar"
                   className="rounded-circle"
-                  style={{ width: '150px' }}
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    objectFit: "cover", // Đảm bảo ảnh khớp khung mà không bị biến dạng
+                    borderRadius: "50%", // Tạo hình tròn cho khung
+                    overflow: "hidden",
+                  }}
                   fluid
                 />
-                <p className="text-muted mt-2 mb-4"> {user?.userName}</p>
+
+                <p className="text-muted mt-4 mb-4"> {user?.userName}</p>
                 <div className="d-flex justify-content-center mb-2">
                   <MDBBtn tag="label" className="btn btn-primary">
                     Upload Avatar
                     <input
                       type="file"
                       accept="image/*"
-                      // onChange={handleFileChange}
+                      onChange={handleFileChange}
                       style={{ display: "none" }}
                     />
                   </MDBBtn>
@@ -259,26 +269,9 @@ export default function ProfilePage() {
                 </MDBRow>
                 <hr />
 
-                {/* Địa chỉ */}
-                <MDBRow>
-                  <MDBCol sm="3">
-                    <MDBCardText>Address</MDBCardText>
-                  </MDBCol>
-                  <MDBCol sm="9">
-                    {editing ? (
-                      <input
-                        type="text"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="form-control form-control-edit"
-                      />
-                    ) : (
-                      <MDBCardText className="text-muted">{user?.address || 'Chưa cập nhật'}</MDBCardText>
-                    )}
-                  </MDBCol>
-                </MDBRow>
 
-                <hr />
+
+
 
                 {/* Nút chỉnh sửa và lưu thay đổi */}
                 <div className="d-flex justify-content-between">
